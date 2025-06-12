@@ -47,7 +47,8 @@ def print_grid(s) -> None:
 
 def astar(start, goal):
     heap = []
-    heappush(heap, (0 + heuristic(start), 0, start, []))
+    # heappush(heap, (0 + manhattan_distance(start), 0, start, []))
+    heappush(heap, (0 + misplaced_tiles(start), 0, start, []))
     visited = set() 
 
     while heap:
@@ -71,24 +72,37 @@ def astar(start, goal):
 
             if new_state not in visited:
                 cost = g + 1 
-                estimate = cost + heuristic(new_state)
+                # estimate = cost + manhattan_distance(new_state)
+                estimate = cost + misplaced_tiles(new_state)
                 heappush(heap, (estimate, cost, new_state, path + [new_state]))
 
     return None 
 
 
-def heuristic(state):
+def manhattan_distance(state):
     distance = 0
-    for i, tile in enumerate(state):
+    for idx, tile in enumerate(state):
         if tile == 0:
             continue 
 
         goal_index = tile - 1
-        current_row, current_col = divmod(i, 3)
+        current_row, current_col = divmod(idx, 3)
         goal_row, goal_col = divmod(goal_index, 3)
         distance += abs(current_row - goal_row) + abs(current_col - goal_col)
 
     return distance 
+
+
+def misplaced_tiles(state):
+    positions = 0 
+    for idx, tile in enumerate(state):
+        if tile == 0:
+            continue
+
+        if (tile - 1) != idx:
+           positions += 1  
+    return positions
+
 
 
 def valid_moves(num: int) -> list[tuple]:
